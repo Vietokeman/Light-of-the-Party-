@@ -1,0 +1,367 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===================================
+   LIGHT OF THE PARTY - THEME STYLES
+   Communist Red & Gold Color Palette
+   =================================== */
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotateY(0deg) rotateZ(0deg);
+  }
+  25% {
+    transform: translateY(-12px) rotateY(8deg) rotateZ(3deg);
+  }
+  50% {
+    transform: translateY(-5px) rotateY(0deg) rotateZ(0deg);
+  }
+  75% {
+    transform: translateY(-12px) rotateY(-8deg) rotateZ(-3deg);
+  }
+}
+
+:root {
+  /* Light of the Party - Communist Theme Colors */
+  --party-red: #B22222;
+  --vietnam-red: #ac0705;
+  --party-gold: #FFD700;
+  --antique-gold: #C9A227;
+  --deep-red: #8b1a1a;
+  --party-white: #ffffff;
+  --off-white: #fafafa;
+  
+  /* Historical Color Palette */
+  --ancient-stone: #6b6560;
+  --royal-burgundy: #8b1a1a;
+  --timeless-navy: #0f1c3f;
+  --rustic-olive: #4a5d23;
+  --antique-parchment: #fafafa;
+  --parchment-dark: #e8dcc8;
+  --sepia: #704214;
+  --ink-black: #1a1a1a;
+
+  /* Semantic colors */
+  --background: linear-gradient(
+    135deg,
+    var(--party-red) 0%,
+    #d32f2f 50%,
+    var(--vietnam-red) 100%
+  );
+  --foreground: var(--party-white);
+  --card-background: var(--off-white);
+  --card-border: var(--party-gold);
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card-background);
+  --color-card-foreground: var(--ink-black);
+  --color-border: var(--card-border);
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply box-border;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    line-height: 1.7;
+    @apply antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Base Typography */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  h1 { font-size: 2.5rem; }
+  h2 { font-size: 2rem; }
+  h3 { font-size: 1.5rem; }
+
+  /* Links */
+  a {
+    color: var(--party-gold);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    color: var(--party-white);
+  }
+
+  /* Container */
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--party-gold);
+    color: var(--deep-red);
+  }
+}
+
+@layer utilities {
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--party-red);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--deep-red);
+  }
+
+  /* Firefox scrollbar */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--party-red) #f1f1f1;
+  }
+
+  /* Line clamp utilities */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Gradient text utility */
+  .gradient-text {
+    @apply bg-gradient-to-r from-party-red-500 to-party-gold-500 bg-clip-text text-transparent;
+  }
+
+  .gradient-text-gold {
+    @apply bg-gradient-to-r from-party-gold-400 to-party-gold-600 bg-clip-text text-transparent;
+  }
+
+  /* Gold shimmer effect for borders */
+  .gold-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gold-shimmer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 215, 0, 0.3),
+      transparent
+    );
+    animation: shimmer 3s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+
+  /* Vietnamese pattern overlay */
+  .vn-pattern-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffd700' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* Glassmorphism utilities */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-light {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  /* Custom Scrollbar for chat */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #fff5f5;
+    border-radius: 3px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--party-red);
+    border-radius: 3px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--deep-red);
+  }
+
+  /* Chat Animations */
+  @keyframes chatbot-slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes message-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .chatbot-slide-up {
+    animation: chatbot-slide-up 0.3s ease-out forwards;
+  }
+
+  .message-fade-in {
+    animation: message-fade-in 0.3s ease-out forwards;
+  }
+
+  /* Intro Loader Animations */
+  @keyframes wave {
+    0%, 100% {
+      transform: translateX(-5%);
+    }
+    50% {
+      transform: translateX(5%);
+    }
+  }
+
+  @keyframes starPulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+  }
+
+  /* Hero Banner Animation */
+  .hero-banner-bg {
+    animation: heroZoom 20s ease-in-out infinite alternate;
+  }
+
+  @keyframes heroZoom {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+  }
+
+  /* Party-themed button styles */
+  .btn-party {
+    @apply bg-gradient-to-r from-party-red-600 to-party-red-500 text-white font-semibold py-3 px-6 rounded-lg shadow-party transition-all duration-300;
+  }
+
+  .btn-party:hover {
+    @apply shadow-party-lg transform -translate-y-0.5;
+  }
+
+  .btn-gold {
+    @apply bg-gradient-to-r from-party-gold-500 to-party-gold-600 text-party-red-700 font-semibold py-3 px-6 rounded-lg shadow-gold transition-all duration-300;
+  }
+
+  .btn-gold:hover {
+    @apply shadow-gold-lg transform -translate-y-0.5;
+  }
+
+  /* Card styles */
+  .card-party {
+    @apply bg-white/90 rounded-xl shadow-lg border border-party-gold-300/50 backdrop-blur-sm;
+  }
+
+  /* Typing cursor animation */
+  .typing-cursor {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Streaming text animation */
+  .streaming-text {
+    animation: fadeInText 0.1s ease-in-out;
+  }
+
+  @keyframes fadeInText {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+  }
+}
+
+/* ===================================
+   CHAT WALLPAPER STYLES
+   =================================== */
+.chat-wallpaper {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Default wallpaper patterns */
+.wallpaper-default {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.wallpaper-party {
+  background: linear-gradient(135deg, rgba(178, 34, 34, 0.1) 0%, rgba(255, 215, 0, 0.1) 100%);
+}
+
+.wallpaper-stars {
+  background-color: #0f0f1a;
+  background-image: 
+    radial-gradient(white 1px, transparent 1px),
+    radial-gradient(white 1px, transparent 1px);
+  background-size: 50px 50px, 30px 30px;
+  background-position: 0 0, 25px 25px;
+}

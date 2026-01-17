@@ -1,0 +1,318 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+
+const introQuotes = [
+  {
+    line1: "Ánh sáng soi đường…",
+    line2: "Illuminating the Path of Ideology",
+  },
+  {
+    line1: "Tư tưởng Hồ Chí Minh – Ngọn đuốc soi đường",
+    line2: "The Guiding Light of Ho Chi Minh Thought",
+  },
+  {
+    line1: "Đảng là ngọn hải đăng…",
+    line2: "Lighting the way to a brighter future",
+  },
+  {
+    line1: "Học tập và làm theo tấm gương Bác Hồ",
+    line2: "Following Uncle Ho's shining example",
+  },
+];
+
+interface IntroLoaderProps {
+  onComplete: () => void;
+}
+
+export default function IntroLoader({ onComplete }: IntroLoaderProps) {
+  const [phase, setPhase] = useState<
+    "loading" | "text1" | "text2" | "fadeOut" | "flag" | "complete"
+  >("loading");
+  const [currentQuote] = useState(
+    () => introQuotes[Math.floor(Math.random() * introQuotes.length)]
+  );
+  const [text1, setText1] = useState("");
+  const [text2, setText2] = useState("");
+  const [showCursor1, setShowCursor1] = useState(true);
+  const [showCursor2, setShowCursor2] = useState(false);
+  const [textOpacity, setTextOpacity] = useState(1);
+  const [flagProgress, setFlagProgress] = useState(0);
+
+  // Typewriter effect for line 1
+  const typeText1 = useCallback(() => {
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < currentQuote.line1.length) {
+        setText1(currentQuote.line1.slice(0, index + 1));
+        index++;
+      } else {
+        clearInterval(interval);
+        setShowCursor1(false);
+        setTimeout(() => {
+          setPhase("text2");
+          setShowCursor2(true);
+        }, 300);
+      }
+    }, 80);
+    return () => clearInterval(interval);
+  }, [currentQuote.line1]);
+
+  // Typewriter effect for line 2
+  const typeText2 = useCallback(() => {
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < currentQuote.line2.length) {
+        setText2(currentQuote.line2.slice(0, index + 1));
+        index++;
+      } else {
+        clearInterval(interval);
+        setShowCursor2(false);
+        setTimeout(() => {
+          setPhase("fadeOut");
+        }, 1000);
+      }
+    }, 60);
+    return () => clearInterval(interval);
+  }, [currentQuote.line2]);
+
+  useEffect(() => {
+    // Initial loading phase
+    const timer = setTimeout(() => {
+      setPhase("text1");
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (phase === "text1") {
+      return typeText1();
+    }
+  }, [phase, typeText1]);
+
+  useEffect(() => {
+    if (phase === "text2") {
+      return typeText2();
+    }
+  }, [phase, typeText2]);
+
+  useEffect(() => {
+    if (phase === "fadeOut") {
+      // Fade out text
+      const fadeInterval = setInterval(() => {
+        setTextOpacity((prev) => {
+          if (prev <= 0) {
+            clearInterval(fadeInterval);
+            setPhase("flag");
+            return 0;
+          }
+          return prev - 0.05;
+        });
+      }, 30);
+      return () => clearInterval(fadeInterval);
+    }
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase === "flag") {
+      // Flag wipe animation
+      const flagInterval = setInterval(() => {
+        setFlagProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(flagInterval);
+            setTimeout(() => {
+              setPhase("complete");
+              onComplete();
+            }, 300);
+            return 100;
+          }
+          return prev + 2;
+        });
+      }, 20);
+      return () => clearInterval(flagInterval);
+    }
+  }, [phase, onComplete]);
+
+  if (phase === "complete") return null;
+
+  return (
+    <div className="fixed inset-0 z-[9999] overflow-hidden">
+      {/* Main dark background with grain */}
+      <div
+        className="absolute inset-0 transition-opacity duration-500"
+        style={{
+          backgroundColor: "#0b0b0b",
+          opacity: phase === "flag" ? 1 - flagProgress / 100 : 1,
+        }}
+      >
+        {/* Grain overlay */}
+        <div
+          className="absolute inset-0 opacity-20 pointer-events-none"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          }}
+        />
+
+        {/* Subtle red gradient spotlight */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, rgba(178, 34, 34, 0.4) 0%, transparent 70%)",
+          }}
+        />
+
+        {/* Gold accent lines */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#FFD700] to-transparent opacity-60" />
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#FFD700] to-transparent opacity-60" />
+      </div>
+
+      {/* Text content */}
+      <div
+        className="absolute inset-0 flex flex-col items-center justify-center px-6"
+        style={{ opacity: textOpacity }}
+      >
+        {/* Decorative top element */}
+        <div className="mb-8 flex items-center gap-4">
+          <div className="w-16 md:w-24 h-px bg-gradient-to-r from-transparent to-[#FFD700]" />
+          <div className="w-2 h-2 rotate-45 border border-[#FFD700]" />
+          <div className="w-16 md:w-24 h-px bg-gradient-to-l from-transparent to-[#FFD700]" />
+        </div>
+
+        {/* Light/Star icon - representing "Light of the Party" */}
+        <div className="mb-8 relative">
+          <div className="absolute inset-0 bg-[#FFD700] blur-xl opacity-40 animate-pulse" />
+          <svg
+            className="w-16 h-16 md:w-20 md:h-20 text-[#FFD700] relative z-10"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            {/* Star with rays - symbolizing light */}
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          {/* Light rays effect */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border border-[#FFD700]/30 animate-ping" style={{ animationDuration: '2s' }} />
+          </div>
+        </div>
+
+        {/* Line 1 - Vietnamese */}
+        <div className="text-center mb-4 min-h-[2rem] md:min-h-[3rem]">
+          <p
+            className="text-xl md:text-3xl lg:text-4xl text-white/90 tracking-wide font-serif"
+            style={{
+              textShadow: "0 0 40px rgba(255, 215, 0, 0.3)",
+            }}
+          >
+            {text1}
+            {showCursor1 && (
+              <span className="animate-pulse text-[#FFD700]">|</span>
+            )}
+          </p>
+        </div>
+
+        {/* Line 2 - English/Subtitle */}
+        <div className="text-center min-h-[2rem] md:min-h-[3rem]">
+          <p
+            className="text-lg md:text-2xl lg:text-3xl text-[#FFD700] tracking-wide italic font-serif"
+            style={{
+              textShadow: "0 0 30px rgba(255, 215, 0, 0.4)",
+            }}
+          >
+            {text2}
+            {showCursor2 && <span className="animate-pulse text-white">|</span>}
+          </p>
+        </div>
+
+        {/* Decorative bottom element */}
+        <div className="mt-8 flex items-center gap-4">
+          <div className="w-16 md:w-24 h-px bg-gradient-to-r from-transparent to-[#FFD700]" />
+          <div className="w-2 h-2 rotate-45 border border-[#FFD700]" />
+          <div className="w-16 md:w-24 h-px bg-gradient-to-l from-transparent to-[#FFD700]" />
+        </div>
+
+        {/* Project name badge */}
+        <div className="mt-12 px-6 py-2 border border-[#FFD700]/30 rounded-full">
+          <span className="text-[#FFD700]/70 text-sm md:text-base tracking-[0.3em] font-light">
+            LIGHT OF THE PARTY
+          </span>
+        </div>
+      </div>
+
+      {/* Flag wipe transition */}
+      {phase === "flag" && (
+        <div
+          className="absolute inset-0 overflow-hidden"
+          style={{
+            clipPath: `polygon(0 0, ${flagProgress}% 0, ${flagProgress}% 100%, 0 100%)`,
+          }}
+        >
+          {/* Red flag background */}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundColor: "#B22222",
+              backgroundImage: `
+                linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(0,0,0,0.1) 25%, transparent 25%)
+              `,
+              backgroundSize: "60px 60px",
+            }}
+          >
+            {/* Waving effect overlay */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `
+                  linear-gradient(90deg, 
+                    rgba(0,0,0,0.2) 0%, 
+                    rgba(255,255,255,0.1) 20%, 
+                    rgba(0,0,0,0.15) 40%,
+                    rgba(255,255,255,0.1) 60%,
+                    rgba(0,0,0,0.2) 80%,
+                    rgba(255,255,255,0.05) 100%
+                  )
+                `,
+                animation: "wave 2s ease-in-out infinite",
+              }}
+            />
+          </div>
+
+          {/* Yellow star */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <svg
+              className="w-32 h-32 md:w-48 md:h-48 lg:w-64 lg:h-64 text-[#FFD700] drop-shadow-2xl"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              style={{
+                filter: "drop-shadow(0 0 30px rgba(255, 215, 0, 0.5))",
+                animation: "starPulse 1.5s ease-in-out infinite",
+              }}
+            >
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          </div>
+
+          {/* Grain overlay on flag */}
+          <div
+            className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+            }}
+          />
+        </div>
+      )}
+
+      {/* Loading indicator */}
+      {phase === "loading" && (
+        <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

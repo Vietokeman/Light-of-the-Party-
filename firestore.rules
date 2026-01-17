@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection - store user profiles
+    match /users/{userId} {
+      // Anyone authenticated can read user profiles (for display purposes)
+      allow read: if request.auth != null;
+      
+      // Users can only write to their own profile
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Analytics counters - visitor tracking
+    match /analytics/{document} {
+      // Anyone can read analytics (for displaying visitor count)
+      allow read: if true;
+      
+      // Only authenticated users can update counters
+      allow write: if request.auth != null;
+    }
+    
+    // Chat sessions (optional - for persistence)
+    match /chats/{chatId} {
+      // Users can only access their own chats
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+  }
+}
