@@ -107,7 +107,7 @@ const HangmanPage: React.FC = () => {
       if (gameStatus !== 'playing') return;
       
       const key = e.key.toUpperCase();
-      if (/^[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ]$/.test(key)) {
+      if (/^[A-Z]$/.test(key)) {
         handleGuess(key);
       }
     };
@@ -121,7 +121,7 @@ const HangmanPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-party-red-50 via-party-gold-50 to-white p-4">
+    <div className="min-h-screen bg-gradient-to-br from-party-red-50 via-party-gold-50 to-white p-4 overflow-auto">
       <div className="max-w-4xl mx-auto py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -187,13 +187,9 @@ const HangmanPage: React.FC = () => {
               {/* Keyboard */}
               <div className="space-y-2">
                 {[
-                  'AÀÁẠẢÃĂẰẮẶẲẴÂẦẤẬẨẪ',
-                  'EÈÉẸẺẼÊỀẾỆỂỄ',
-                  'IÌÍỊỈĨ',
-                  'OÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠ',
-                  'UÙÚỤỦŨƯỪỨỰỬỮ',
-                  'YỲÝỴỶỸ',
-                  'BCĐGHKLMNPQRSTVX',
+                  'QWERTYUIOP',
+                  'ASDFGHJKL',
+                  'ZXCVBNM',
                 ].map((row, rowIndex) => (
                   <div key={rowIndex} className="flex justify-center gap-1 flex-wrap">
                     {row.split('').map(letter => {
