@@ -143,21 +143,33 @@ export async function sendMessageToGemini(
     );
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       console.error('Gemini API Error:', errorData);
       throw new Error(`Lỗi API Gemini: ${response.statusText}`);
     }
 
     const data = await response.json();
+    console.log('Gemini API Response:', data); // Debug log
 
-    if (data.candidates && data.candidates.length > 0) {
-      const content = data.candidates[0].content?.parts[0]?.text;
-      if (content) {
-        return content;
-      }
+    // Check if response has expected structure
+    if (!data.candidates || !Array.isArray(data.candidates) || data.candidates.length === 0) {
+      console.error('Invalid response structure:', data);
+      throw new Error('Gemini API trả về dữ liệu không hợp lệ');
     }
 
-    throw new Error('Không nhận được phản hồi từ Gemini');
+    const candidate = data.candidates[0];
+    if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+      console.error('Missing content in response:', candidate);
+      throw new Error('Không có nội dung trong phản hồi từ Gemini');
+    }
+
+    const content = candidate.content.parts[0]?.text;
+    if (!content) {
+      console.error('Missing text in parts:', candidate.content.parts);
+      throw new Error('Không nhận được văn bản từ Gemini');
+    }
+
+    return content;
   } catch (error) {
     console.error('Error calling Gemini API:', error);
     throw error;
