@@ -1,5 +1,5 @@
 // TEMPORARILY COMMENTED FOR UI TESTING
-/*
+
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
@@ -8,13 +8,13 @@ import { getAnalytics, Analytics } from 'firebase/analytics';
 // Firebase configuration from environment variables
 // Trim values to remove any whitespace/newlines (especially from Vercel env vars)
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY?.trim(),
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN?.trim(),
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID?.trim(),
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET?.trim(),
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID?.trim(),
-  appId: import.meta.env.VITE_FIREBASE_APP_ID?.trim(),
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID?.trim(),
+  apiKey: "AIzaSyApu5LSV-zFlQ70J1MuSxPbvihcw6Jxx4U",
+  authDomain: "light-of-the-party.firebaseapp.com",
+  projectId: "light-of-the-party",
+  storageBucket: "light-of-the-party.firebasestorage.app",
+  messagingSenderId: "547560678376",
+  appId: "1:547560678376:web:387c5b00bede671fffba5d",
+  measurementId: "G-61PSPE1RP4"
 };
 
 // Debug logging for development
@@ -52,13 +52,13 @@ if (typeof window !== 'undefined' && import.meta.env.PROD) {
 }
 
 export { app, db, auth, analytics };
-*/
+
 
 // MOCK EXPORTS FOR UI TESTING (WITHOUT FIREBASE)
-console.log('⚠️ Firebase is DISABLED - Using mock data for UI testing');
+// console.log('⚠️ Firebase is DISABLED - Using mock data for UI testing');
 
-export const app: any = null;
-export const db: any = null;
-export const auth: any = null;
-export const analytics: any = undefined;
-export default app;
+// export const app: any = null;
+// export const db: any = null;
+// export const auth: any = null;
+// export const analytics: any = undefined;
+// export default app;

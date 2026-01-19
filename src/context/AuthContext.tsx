@@ -1,6 +1,4 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-// TEMPORARILY COMMENTED FOR UI TESTING
-/*
 import {
   User,
   onAuthStateChanged,
@@ -14,11 +12,8 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp, increment } from 'firebase/firestore';
 import { auth, db } from '@/config/firebase';
-*/
 import { UserProfile, ProfileUpdatePayload, WallpaperConfig } from '@/types';
-
-// Mock User type
-type User = any;
+import { setUserOnline, setUserOffline } from '@/services/visitorService';
 
 interface AuthContextType {
   user: User | null;
@@ -39,22 +34,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// MOCK PROVIDERS (Firebase commented)
-// const googleProvider = new GoogleAuthProvider();
-// const facebookProvider = new FacebookAuthProvider();
+const googleProvider = new GoogleAuthProvider();
+const facebookProvider = new FacebookAuthProvider();
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(false); // Changed to false for mock
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [wallpaperConfig, setWallpaperConfig] = useState<WallpaperConfig>({ type: 'default' });
 
-  // Increment visitor counter (DISABLED - Firebase commented)
+  // Increment visitor counter
   const incrementVisitorCount = useCallback(async (uid: string) => {
-    console.log('Mock: Visitor count incremented for', uid);
-    // Firebase code commented
-    /*
     try {
       const counterRef = doc(db, 'analytics', 'counters');
       await setDoc(counterRef, {
@@ -64,14 +55,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Failed to increment visitor count:', error);
     }
-    */
   }, []);
 
-  // Create or update user profile in Firestore (DISABLED - Firebase commented)
+  // Create or update user profile in Firestore
   const syncUserProfile = useCallback(async (firebaseUser: User, isNewUser: boolean = false) => {
-    console.log('Mock: Syncing user profile', firebaseUser);
-    // Firebase code commented
-    /*
     try {
       const userRef = doc(db, 'users', firebaseUser.uid);
       const userSnap = await getDoc(userRef);
@@ -87,10 +74,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           lastLoginAt: serverTimestamp(),
         };
         await setDoc(userRef, newProfile);
-        
+
         // Increment visitor counter for new users
         await incrementVisitorCount(firebaseUser.uid);
-        
+
         setUserProfile({
           uid: firebaseUser.uid,
           ...newProfile,
@@ -100,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         // Update last login
         await setDoc(userRef, { lastLoginAt: serverTimestamp() }, { merge: true });
-        
+
         const data = userSnap.data();
         setUserProfile({
           uid: firebaseUser.uid,
@@ -122,72 +109,115 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [incrementVisitorCount]);
 
-  // Auth state listener (DISABLED - Firebase commented)
+  // Auth state listener
   useEffect(() => {
-    console.log('Mock: Auth state listener initialized');
-    setIsLoading(false);
-    // Firebase code commented
-    /*
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
-      
+
       if (firebaseUser) {
         await syncUserProfile(firebaseUser);
+        // Mark user as online
+        await setUserOnline(firebaseUser.uid, firebaseUser.displayName || undefined);
       } else {
         setUserProfile(null);
         setWallpaperConfig({ type: 'default' });
       }
-      
+
       setIsLoading(false);
     });
 
     return () => unsubscribe();
-    */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Sign in with Google (MOCK)
+  // Sign in with Google
   const signInWithGoogle = async () => {
-    console.log('Mock: Google sign in');
-    alert('Firebase đã được tắt tạm thời. Đây là mock UI để kiểm tra giao diện.');
-    // Firebase code commented
+    setError(null);
+    setIsLoading(true);
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      await syncUserProfile(result.user, true);
+    } catch (err: any) {
+      const errorMessage = getAuthErrorMessage(err.code);
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Sign in with Facebook (MOCK)
+  // Sign in with Facebook
   const signInWithFacebook = async () => {
-    console.log('Mock: Facebook sign in');
-    alert('Firebase đã được tắt tạm thời. Đây là mock UI để kiểm tra giao diện.');
-    // Firebase code commented
+    setError(null);
+    setIsLoading(true);
+    try {
+      const result = await signInWithPopup(auth, facebookProvider);
+      await syncUserProfile(result.user, true);
+    } catch (err: any) {
+      const errorMessage = getAuthErrorMessage(err.code);
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Sign in with email/password (MOCK)
+  // Sign in with email/password
   const signInWithEmail = async (email: string, password: string) => {
-    console.log('Mock: Email sign in', email);
-    alert('Firebase đã được tắt tạm thời. Đây là mock UI để kiểm tra giao diện.');
-    // Firebase code commented
+    setError(null);
+    setIsLoading(true);
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      await syncUserProfile(result.user);
+    } catch (err: any) {
+      const errorMessage = getAuthErrorMessage(err.code);
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Sign up with email/password (MOCK)
+  // Sign up with email/password
   const signUpWithEmail = async (email: string, password: string, displayName: string) => {
-    console.log('Mock: Email sign up', email, displayName);
-    alert('Firebase đã được tắt tạm thời. Đây là mock UI để kiểm tra giao diện.');
-    // Firebase code commented
+    setError(null);
+    setIsLoading(true);
+    try {
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+
+      // Update display name
+      await updateProfile(result.user, { displayName });
+
+      await syncUserProfile(result.user, true);
+    } catch (err: any) {
+      const errorMessage = getAuthErrorMessage(err.code);
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Sign out (MOCK)
+  // Sign out
   const signOut = async () => {
-    console.log('Mock: Sign out');
-    setUserProfile(null);
-    setWallpaperConfig({ type: 'default' });
-    // Firebase code commented
+    setError(null);
+    try {
+      // Mark user as offline before signing out
+      if (user) {
+        await setUserOffline(user.uid);
+      }
+      await firebaseSignOut(auth);
+      setUser(null);
+      setUserProfile(null);
+      setWallpaperConfig({ type: 'default' });
+    } catch (err: any) {
+      setError(err.message || 'Đăng xuất thất bại');
+      throw err;
+    }
   };
 
-  // Update user profile (MOCK)
+  // Update user profile
   const updateUserProfile = async (data: ProfileUpdatePayload) => {
-    console.log('Mock: Update user profile', data);
-    alert('Firebase đã được tắt tạm thời. Đây là mock UI để kiểm tra giao diện.');
-    // Firebase code commented
-    /*
     if (!user) throw new Error('Chưa đăng nhập');
 
     try {
@@ -214,21 +244,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(err.message || 'Cập nhật hồ sơ thất bại');
       throw err;
     }
-    */
   };
 
-  // Set wallpaper (MOCK)
+  // Set wallpaper
   const setWallpaper = (config: WallpaperConfig) => {
-    console.log('Mock: Set wallpaper', config);
     setWallpaperConfig(config);
-    // Firebase code commented
-    /*
+
     // Persist to Firestore if logged in
     if (user && config.type === 'custom' && config.customUrl) {
       const userRef = doc(db, 'users', user.uid);
       setDoc(userRef, { customBackground: config.customUrl }, { merge: true });
     }
-    */
   };
 
   const clearError = () => setError(null);

@@ -1,119 +1,100 @@
-// TEMPORARILY COMMENTED FOR UI TESTING
-/*
-import { doc, getDoc, setDoc, increment, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, deleteDoc, onSnapshot, collection, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/config/firebase';
-*/
 import { VisitorStats } from '@/types';
 
-const COUNTER_DOC_PATH = 'analytics/counters';
+const ONLINE_USERS_COLLECTION = 'onlineUsers';
 
 /**
- * Get current visitor statistics (MOCK)
+ * Mark user as online when they log in
  */
-export async function getVisitorStats(): Promise<VisitorStats> {
-  console.log('Mock: Getting visitor stats');
-  // Return mock data
-  return {
-    totalVisitors: 1234,
-    todayVisitors: 56,
-    lastUpdated: new Date(),
-  };
-  
-  // Firebase code commented
-  /*
+export async function setUserOnline(userId: string, displayName?: string): Promise<void> {
   try {
-    const counterRef = doc(db, COUNTER_DOC_PATH);
-    const counterSnap = await getDoc(counterRef);
-
-    if (counterSnap.exists()) {
-      const data = counterSnap.data();
-      return {
-        totalVisitors: data.totalVisitors || 0,
-        todayVisitors: data.todayVisitors || 0,
-        lastUpdated: data.lastUpdated?.toDate() || new Date(),
-      };
-    }
-
-    // Initialize if doesn't exist
-    const initialStats: VisitorStats = {
-      totalVisitors: 0,
-      todayVisitors: 0,
-      lastUpdated: new Date(),
-    };
+    const userRef = doc(db, ONLINE_USERS_COLLECTION, userId);
+    await setDoc(userRef, {
+      displayName: displayName || 'Anonymous',
+      lastSeen: serverTimestamp(),
+      isOnline: true,
+    });
     
-    await setDoc(counterRef, initialStats);
-    return initialStats;
+    // Set up beforeunload to mark user offline when they leave
+    window.addEventListener('beforeunload', () => {
+      setUserOffline(userId);
+    });
   } catch (error) {
-    console.error('Error fetching visitor stats:', error);
-    return {
-      totalVisitors: 0,
-      todayVisitors: 0,
-      lastUpdated: new Date(),
-    };
+    console.error('Error setting user online:', error);
   }
-  */
 }
 
 /**
- * Increment visitor count (MOCK)
+ * Mark user as offline when they log out or leave
  */
-export async function incrementVisitorCount(): Promise<void> {
-  console.log('Mock: Incrementing visitor count');
-  // Firebase code commented
-  /*
+export async function setUserOffline(userId: string): Promise<void> {
   try {
-    const counterRef = doc(db, COUNTER_DOC_PATH);
-    await setDoc(counterRef, {
-      totalVisitors: increment(1),
-      lastUpdated: new Date(),
-    }, { merge: true });
+    const userRef = doc(db, ONLINE_USERS_COLLECTION, userId);
+    await deleteDoc(userRef);
   } catch (error) {
-    console.error('Error incrementing visitor count:', error);
+    console.error('Error setting user offline:', error);
   }
-  */
 }
 
 /**
- * Subscribe to real-time visitor count updates (MOCK)
+ * Get current online user count
  */
-export function subscribeToVisitorStats(
-  callback: (stats: VisitorStats) => void
+export async function getOnlineUserCount(): Promise<number> {
+  try {
+    const onlineRef = collection(db, ONLINE_USERS_COLLECTION);
+    const snapshot = await getDocs(onlineRef);
+    return snapshot.size;
+  } catch (error) {
+    console.error('Error getting online user count:', error);
+    return 0;
+  }
+}
+
+/**
+ * Subscribe to real-time online user count
+ */
+export function subscribeToOnlineUsers(
+  callback: (count: number) => void
 ): () => void {
-  console.log('Mock: Subscribing to visitor stats');
+  const onlineRef = collection(db, ONLINE_USERS_COLLECTION);
   
-  // Return mock data immediately
-  callback({
-    totalVisitors: 1234,
-    todayVisitors: 56,
-    lastUpdated: new Date(),
-  });
-  
-  // Return empty unsubscribe function
-  return () => {
-    console.log('Mock: Unsubscribed from visitor stats');
-  };
-  
-  // Firebase code commented
-  /*
-  // Firebase code commented
-  /*
-  const counterRef = doc(db, COUNTER_DOC_PATH);
-  
-  const unsubscribe = onSnapshot(counterRef, (snapshot) => {
-    if (snapshot.exists()) {
-      const data = snapshot.data();
-      callback({
-        totalVisitors: data.totalVisitors || 0,
-        todayVisitors: data.todayVisitors || 0,
-        lastUpdated: data.lastUpdated?.toDate() || new Date(),
-      });
-    }
+  const unsubscribe = onSnapshot(onlineRef, (snapshot) => {
+    callback(snapshot.size);
   }, (error) => {
-    console.error('Error subscribing to visitor stats:', error);
+    console.error('Error subscribing to online users:', error);
   });
 
   return unsubscribe;
-  */
 }
 
-export default { getVisitorStats, incrementVisitorCount, subscribeToVisitorStats };
+// Legacy exports for backward compatibility
+export async function getVisitorStats(): Promise<VisitorStats> {
+  const count = await getOnlineUserCount();
+  return {
+    totalVisitors: count,
+    todayVisitors: count,
+    lastUpdated: new Date(),
+  };
+}
+
+export function subscribeToVisitorStats(
+  callback: (stats: VisitorStats) => void
+): () => void {
+  return subscribeToOnlineUsers((count) => {
+    callback({
+      totalVisitors: count,
+      todayVisitors: count,
+      lastUpdated: new Date(),
+    });
+  });
+}
+
+export default { 
+  setUserOnline, 
+  setUserOffline, 
+  getOnlineUserCount, 
+  subscribeToOnlineUsers,
+  getVisitorStats, 
+  subscribeToVisitorStats 
+};
