@@ -41,7 +41,7 @@ const HangmanPage: React.FC = () => {
     const availableWords = hangmanWords.filter(
       w => !usedWords.find(used => used.word === w.word)
     );
-    
+
     if (availableWords.length === 0 || currentQuestion > TOTAL_QUESTIONS) {
       setGameStatus('finished');
       return;
@@ -68,14 +68,23 @@ const HangmanPage: React.FC = () => {
     // Check if letter is in word (normalized)
     const normalizedWord = normalizeVietnamese(currentWord.word);
     const normalizedLetter = normalizeVietnamese(letter);
-    
+
     if (!normalizedWord.includes(normalizedLetter)) {
       const newWrong = wrongGuesses + 1;
       setWrongGuesses(newWrong);
-      
+
       if (newWrong >= MAX_WRONG_GUESSES) {
         setGameStatus('lost');
         setStreak(0);
+
+        // Auto-save score if this is the final question
+        if (currentQuestion >= TOTAL_QUESTIONS) {
+          setGameStatus('finished');
+          setTimeout(() => {
+            handleSaveScore();
+          }, 100);
+        }
+
         setShowResult(true);
       }
     } else {
@@ -84,15 +93,24 @@ const HangmanPage: React.FC = () => {
         .split('')
         .filter(c => c !== ' ')
         .every(c => Array.from(newGuessed).some(g => normalizeVietnamese(g) === c));
-      const newStreak = streak + 1;
-        setStreak(newStreak);
-        setMaxStreak(prev => Math.max(prev, newStreak));
-        setCorrectAnswers
+
       if (allLettersGuessed) {
         setGameStatus('won');
         const points = 100 + (streak * 50) + ((MAX_WRONG_GUESSES - wrongGuesses) * 20);
         setScore(prev => prev + points);
         setStreak(prev => prev + 1);
+        setMaxStreak(prev => Math.max(prev, streak + 1));
+        setCorrectAnswers(prev => prev + 1);
+
+        // Auto-save score if this is the final question
+        if (currentQuestion >= TOTAL_QUESTIONS) {
+          setGameStatus('finished');
+          // Save score after state updates
+          setTimeout(() => {
+            handleSaveScore();
+          }, 100);
+        }
+
         setShowResult(true);
       }
     }
@@ -101,6 +119,7 @@ const HangmanPage: React.FC = () => {
   const handleNextQuestion = () => {
     if (currentQuestion >= TOTAL_QUESTIONS) {
       setGameStatus('finished');
+      setShowResult(false); // Close modal to show final results
       handleSaveScore();
     } else {
       setCurrentQuestion(prev => prev + 1);
@@ -110,7 +129,7 @@ const HangmanPage: React.FC = () => {
 
   const handleSaveScore = async () => {
     if (!user || !userProfile || scoreSaved) return;
-    
+
     try {
       await saveHangmanScore(
         user.uid,
@@ -144,7 +163,7 @@ const HangmanPage: React.FC = () => {
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (gameStatus !== 'playing') return;
-      
+
       const key = e.key.toUpperCase();
       // Chỉ chấp nhận chữ cái A-Z, không chấp nhận số
       if (/^[A-Z]$/.test(key)) {
@@ -172,7 +191,7 @@ const HangmanPage: React.FC = () => {
             <ArrowLeft size={20} />
             <span>Quay lại</span>
           </button>
-          
+
           <div className="flex items-center gap-4">
             <button
               onClick={() => setShowLeaderboard(true)}
@@ -215,7 +234,7 @@ const HangmanPage: React.FC = () => {
                   const isGuessed = Array.from(guessedLetters).some(
                     g => normalizeVietnamese(g) === normalized
                   );
-                  
+
                   return isSpace ? (
                     <div key={index} className="w-4" />
                   ) : (
@@ -241,21 +260,20 @@ const HangmanPage: React.FC = () => {
                   <div key={rowIndex} className="flex justify-center gap-1 flex-wrap">
                     {row.split('').map(letter => {
                       const isGuessed = guessedLetters.has(letter);
-                      const isCorrect = currentWord.word.toUpperCase().includes(letter) || 
-                                       normalizeVietnamese(currentWord.word).includes(normalizeVietnamese(letter));
-                      
+                      const isCorrect = currentWord.word.toUpperCase().includes(letter) ||
+                        normalizeVietnamese(currentWord.word).includes(normalizeVietnamese(letter));
+
                       return (
                         <button
                           key={letter}
                           onClick={() => handleGuess(letter)}
                           disabled={isGuessed || gameStatus !== 'playing'}
-                          className={`w-10 h-10 rounded-lg font-bold transition-all ${
-                            !isGuessed
-                              ? 'bg-party-red-500 text-white hover:bg-party-red-600'
-                              : isCorrect
+                          className={`w-10 h-10 rounded-lg font-bold transition-all ${!isGuessed
+                            ? 'bg-party-red-500 text-white hover:bg-party-red-600'
+                            : isCorrect
                               ? 'bg-green-500 text-white'
                               : 'bg-gray-300 text-gray-500'
-                          } disabled:cursor-not-allowed`}
+                            } disabled:cursor-not-allowed`}
                         >
                           {letter}
                         </button>
@@ -271,9 +289,8 @@ const HangmanPage: React.FC = () => {
               {Array.from({ length: MAX_WRONG_GUESSES }).map((_, i) => (
                 <div
                   key={i}
-                  className={`w-8 h-8 rounded-full ${
-                    i < wrongGuesses ? 'bg-red-500' : 'bg-green-500'
-                  }`}
+                  className={`w-8 h-8 rounded-full ${i < wrongGuesses ? 'bg-red-500' : 'bg-green-500'
+                    }`}
                 />
               ))}
             </div>
@@ -287,28 +304,40 @@ const HangmanPage: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              onClick={currentQuestion >= TOTAL_QUESTIONS ? () => setShowResult(false) : undefined}
               className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
             >
               <motion.div
                 initial={{ scale: 0.9, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
-                className="bg-white rounded-2xl p-8 max-w-md w-full text-center"
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-2xl p-8 max-w-md w-full text-center relative"
               >
-                <div className={`w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center ${
-                  gameStatus === 'won' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                }`}>
+                {/* Close Button - Only show on final question */}
+                {currentQuestion >= TOTAL_QUESTIONS && (
+                  <button
+                    onClick={() => setShowResult(false)}
+                    className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 transition-colors"
+                    aria-label="Close"
+                  >
+                    ✕
+                  </button>
+                )}
+
+                <div className={`w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center ${gameStatus === 'won' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                  }`}>
                   {gameStatus === 'won' ? '✓' : '✗'}
                 </div>
-                
+
                 <h2 className="text-2xl font-bold mb-2">
                   {gameStatus === 'won' ? 'Chính xác!' : 'Không chính xác!'}
                 </h2>
-                
+
                 <p className="text-gray-600 mb-4">
                   Đáp án: <span className="font-bold text-party-red-600">{currentWord?.word}</span>
                 </p>
-                
+
                 <button
                   onClick={handleNextQuestion}
                   className="w-full py-3 bg-gradient-to-r from-party-red-600 to-party-gold-500 text-white font-bold rounded-lg hover:shadow-lg transition"
@@ -336,7 +365,7 @@ const HangmanPage: React.FC = () => {
                 <p className="text-green-600 text-sm">✓ Điểm số đã được lưu vào bảng xếp hạng</p>
               )}
             </div>
-            
+
             <div className="flex gap-4 justify-center flex-wrap">
               <button
                 onClick={() => setShowLeaderboard(true)}
@@ -363,11 +392,11 @@ const HangmanPage: React.FC = () => {
           </div>
         )}
       </div>
-      
+
       {/* Leaderboard Modal */}
-      <LeaderboardModal 
-        isOpen={showLeaderboard} 
-        onClose={() => setShowLeaderboard(false)} 
+      <LeaderboardModal
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
       />
     </div>
   );
@@ -387,27 +416,27 @@ const HangmanDrawing: React.FC<{ wrongGuesses: number }> = ({ wrongGuesses }) =>
       {wrongGuesses >= 1 && (
         <circle cx="140" cy="70" r="20" stroke="#B91C1C" strokeWidth="4" fill="none" />
       )}
-      
+
       {/* Body */}
       {wrongGuesses >= 2 && (
         <line x1="140" y1="90" x2="140" y2="150" stroke="#B91C1C" strokeWidth="4" strokeLinecap="round" />
       )}
-      
+
       {/* Left Arm */}
       {wrongGuesses >= 3 && (
         <line x1="140" y1="110" x2="110" y2="130" stroke="#B91C1C" strokeWidth="4" strokeLinecap="round" />
       )}
-      
+
       {/* Right Arm */}
       {wrongGuesses >= 4 && (
         <line x1="140" y1="110" x2="170" y2="130" stroke="#B91C1C" strokeWidth="4" strokeLinecap="round" />
       )}
-      
+
       {/* Left Leg */}
       {wrongGuesses >= 5 && (
         <line x1="140" y1="150" x2="120" y2="190" stroke="#B91C1C" strokeWidth="4" strokeLinecap="round" />
       )}
-      
+
       {/* Right Leg */}
       {wrongGuesses >= 6 && (
         <line x1="140" y1="150" x2="160" y2="190" stroke="#B91C1C" strokeWidth="4" strokeLinecap="round" />
