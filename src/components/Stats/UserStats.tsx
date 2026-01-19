@@ -1,22 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Users } from 'lucide-react';
-import { subscribeToTotalUsers } from '@/services/userStatsService';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '@/config/firebase';
+
+const USERS_COLLECTION = 'users';
 
 export const UserStats: React.FC = () => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Subscribe to total users
-    const unsubscribeTotal = subscribeToTotalUsers((count) => {
-      setTotalCount(count);
-      setIsLoading(false);
-    });
+    // Subscribe to users collection to get real-time count
+    const usersRef = collection(db, USERS_COLLECTION);
+    
+    const unsubscribe = onSnapshot(
+      usersRef,
+      (snapshot) => {
+        setTotalCount(snapshot.size);
+        setIsLoading(false);
+      },
+      (error) => {
+        console.error('Error subscribing to users:', error);
+        setIsLoading(false);
+      }
+    );
 
     // Cleanup subscription
     return () => {
-      unsubscribeTotal();
+      unsubscribe();
     };
   }, []);
 
