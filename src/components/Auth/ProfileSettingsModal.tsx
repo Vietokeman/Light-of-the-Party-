@@ -99,7 +99,7 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isOpen, onC
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       placeholder="Nhập tên hiển thị"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-party-red-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-party-red-500 focus:border-transparent text-gray-900"
                     />
                   </div>
                 </div>
@@ -116,7 +116,7 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isOpen, onC
                       value={photoURL}
                       onChange={(e) => setPhotoURL(e.target.value)}
                       placeholder="https://example.com/avatar.jpg"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-party-red-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-party-red-500 focus:border-transparent text-gray-900"
                     />
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
@@ -136,7 +136,7 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isOpen, onC
                       value={customBackground}
                       onChange={(e) => setCustomBackground(e.target.value)}
                       placeholder="https://example.com/background.jpg"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-party-red-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-party-red-500 focus:border-transparent text-gray-900"
                     />
                   </div>
                   <p className="text-xs text-gray-500 mt-1">

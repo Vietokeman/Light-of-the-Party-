@@ -1,23 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Trophy, RotateCcw, Home } from 'lucide-react';
+import { ArrowLeft, Trophy, RotateCcw, Home, TrendingUp } from 'lucide-react';
 import { hangmanWords, HangmanWord, normalizeVietnamese } from '@/data/hangman';
+import { useAuth } from '@/context/AuthContext';
+import { saveHangmanScore } from '@/services/hangmanService';
+import LeaderboardModal from '@/components/Hangman/LeaderboardModal';
 
 const MAX_WRONG_GUESSES = 6;
 const TOTAL_QUESTIONS = 10;
 
 const HangmanPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user, userProfile } = useAuth();
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [maxStreak, setMaxStreak] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
   const [usedWords, setUsedWords] = useState<HangmanWord[]>([]);
   const [currentWord, setCurrentWord] = useState<HangmanWord | null>(null);
   const [guessedLetters, setGuessedLetters] = useState<Set<string>>(new Set());
   const [wrongGuesses, setWrongGuesses] = useState(0);
   const [gameStatus, setGameStatus] = useState<'playing' | 'won' | 'lost' | 'finished'>('playing');
   const [showResult, setShowResult] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [scoreSaved, setScoreSaved] = useState(false);
 
   // Initialize first word
   useEffect(() => {
@@ -71,7 +79,10 @@ const HangmanPage: React.FC = () => {
         .split('')
         .filter(c => c !== ' ')
         .every(c => Array.from(newGuessed).some(g => normalizeVietnamese(g) === c));
-      
+      const newStreak = streak + 1;
+        setStreak(newStreak);
+        setMaxStreak(prev => Math.max(prev, newStreak));
+        setCorrectAnswers
       if (allLettersGuessed) {
         setGameStatus('won');
         const points = 100 + (streak * 50) + ((MAX_WRONG_GUESSES - wrongGuesses) * 20);
@@ -85,9 +96,29 @@ const HangmanPage: React.FC = () => {
   const handleNextQuestion = () => {
     if (currentQuestion >= TOTAL_QUESTIONS) {
       setGameStatus('finished');
+      handleSaveScore();
     } else {
       setCurrentQuestion(prev => prev + 1);
       getNewWord();
+    }
+  };
+
+  const handleSaveScore = async () => {
+    if (!user || !userProfile || scoreSaved) return;
+    
+    try {
+      await saveHangmanScore(
+        user.uid,
+        userProfile.displayName || 'Anonymous',
+        score,
+        TOTAL_QUESTIONS,
+        correctAnswers,
+        maxStreak,
+        userProfile.photoURL
+      );
+      setScoreSaved(true);
+    } catch (error) {
+      console.error('Error saving score:', error);
     }
   };
 
@@ -95,9 +126,12 @@ const HangmanPage: React.FC = () => {
     setCurrentQuestion(1);
     setScore(0);
     setStreak(0);
+    setMaxStreak(0);
+    setCorrectAnswers(0);
     setUsedWords([]);
     setGameStatus('playing');
     setShowResult(false);
+    setScoreSaved(false);
     getNewWord();
   };
 
@@ -127,13 +161,20 @@ const HangmanPage: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-party-red-600 hover:text-party-red-700 font-medium"
+            className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow hover:shadow-lg text-party-red-600 hover:text-party-red-700 font-medium transition-all hover:scale-105"
           >
             <ArrowLeft size={20} />
             <span>Quay lại</span>
           </button>
           
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowLeaderboard(true)}
+              className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow hover:shadow-lg text-party-gold-600 hover:text-party-gold-700 font-medium transition-all hover:scale-105"
+            >
+              <TrendingUp size={20} />
+              <span className="hidden sm:inline">Bảng xếp hạng</span>
+            </button>
             <div className="bg-white px-4 py-2 rounded-lg shadow">
               <span className="text-sm text-gray-600">Câu {currentQuestion}/{TOTAL_QUESTIONS}</span>
             </div>
@@ -277,12 +318,27 @@ const HangmanPage: React.FC = () => {
         {gameStatus === 'finished' && (
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
             <Trophy className="w-20 h-20 mx-auto mb-4 text-party-gold-500" />
-            <h2 className="text-3xl font-bold mb-4">Hoàn thành!</h2>
-            <p className="text-2xl mb-6">
-              Điểm số: <span className="font-bold text-party-red-600">{score}</span>
-            </p>
+            <h2 className="text-3xl font-bold mb-2">Hoàn thành!</h2>
+            <div className="mb-6 space-y-2">
+              <p className="text-2xl">
+                Điểm số: <span className="font-bold text-party-red-600">{score}</span>
+              </p>
+              <p className="text-gray-600">
+                Trả lời đúng: {correctAnswers}/{TOTAL_QUESTIONS} • Streak tối đa: {maxStreak}
+              </p>
+              {scoreSaved && (
+                <p className="text-green-600 text-sm">✓ Điểm số đã được lưu vào bảng xếp hạng</p>
+              )}
+            </div>
             
-            <div className="flex gap-4 justify-center">
+            <div className="flex gap-4 justify-center flex-wrap">
+              <button
+                onClick={() => setShowLeaderboard(true)}
+                className="flex items-center gap-2 px-6 py-3 border-2 border-party-gold-600 text-party-gold-600 font-bold rounded-lg hover:bg-party-gold-50 transition"
+              >
+                <TrendingUp size={20} />
+                Xem bảng xếp hạng
+              </button>
               <button
                 onClick={() => navigate('/')}
                 className="flex items-center gap-2 px-6 py-3 border-2 border-party-red-600 text-party-red-600 font-bold rounded-lg hover:bg-party-red-50 transition"
@@ -301,6 +357,12 @@ const HangmanPage: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {/* Leaderboard Modal */}
+      <LeaderboardModal 
+        isOpen={showLeaderboard} 
+        onClose={() => setShowLeaderboard(false)} 
+      />
     </div>
   );
 };

@@ -85,22 +85,22 @@ const AIUsagePage: React.FC = () => {
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="flex-1 text-center p-4 bg-party-red-50 rounded-lg">
                   <MessageSquare className="mx-auto mb-2 text-party-red-600" size={24} />
-                  <p className="text-sm font-medium">1. User Query</p>
+                  <p className="text-sm font-medium text-gray-900">1. User Query</p>
                 </div>
                 <div className="hidden md:block text-party-gold-500">→</div>
                 <div className="flex-1 text-center p-4 bg-party-gold-50 rounded-lg">
                   <Search className="mx-auto mb-2 text-party-gold-600" size={24} />
-                  <p className="text-sm font-medium">2. LightRAG Retrieval</p>
+                  <p className="text-sm font-medium text-gray-900">2. LightRAG Retrieval</p>
                 </div>
                 <div className="hidden md:block text-party-gold-500">→</div>
                 <div className="flex-1 text-center p-4 bg-party-red-50 rounded-lg">
                   <Layers className="mx-auto mb-2 text-party-red-600" size={24} />
-                  <p className="text-sm font-medium">3. Context Augmentation</p>
+                  <p className="text-sm font-medium text-gray-900">3. Context Augmentation</p>
                 </div>
                 <div className="hidden md:block text-party-gold-500">→</div>
                 <div className="flex-1 text-center p-4 bg-party-gold-50 rounded-lg">
                   <Zap className="mx-auto mb-2 text-party-gold-600" size={24} />
-                  <p className="text-sm font-medium">4. Gemini Generation</p>
+                  <p className="text-sm font-medium text-gray-900">4. Gemini Generation</p>
                 </div>
               </div>
             </Card>

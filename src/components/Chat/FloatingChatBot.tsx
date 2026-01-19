@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Loader, MessageCircle, X, Minimize2, Maximize2 } from 'lucide-react';
+import { Send, Loader, MessageCircle, X, Minimize2, Maximize2, Lock } from 'lucide-react';
 import { sendMessageToGemini } from '../../services/geminiService';
+import { useAuth } from '@/context/AuthContext';
 
 interface Message {
     id: string;
@@ -11,8 +12,10 @@ interface Message {
 }
 
 const FloatingChatBot: React.FC = () => {
+    const { user, userProfile } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
+    const [showLoginPrompt, setShowLoginPrompt] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '0',
@@ -33,6 +36,15 @@ const FloatingChatBot: React.FC = () => {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    const handleOpenChat = () => {
+        if (!user) {
+            setShowLoginPrompt(true);
+            setTimeout(() => setShowLoginPrompt(false), 3000);
+            return;
+        }
+        setIsOpen(true);
+    };
 
     const handleSendMessage = async () => {
         if (!input.trim()) return;
@@ -88,17 +100,36 @@ const FloatingChatBot: React.FC = () => {
             <AnimatePresence>
                 {!isOpen && (
                     <motion.button
-                        onClick={() => setIsOpen(true)}
+                        onClick={handleOpenChat}
                         className="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-gradient-to-r from-red-600 to-yellow-500 text-white shadow-2xl hover:shadow-xl hover:scale-110 transition-all flex items-center justify-center z-40"
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
-                        title="Mở trợ lý Tư tưởng HCM"
+                        title={user ? "Mở trợ lý Tư tưởng HCM" : "Vui lòng đăng nhập để sử dụng"}
                     >
-                        <MessageCircle size={32} />
+                        {user ? <MessageCircle size={32} /> : <Lock size={32} />}
                     </motion.button>
+                )}
+            </AnimatePresence>
+
+            {/* Login Prompt */}
+            <AnimatePresence>
+                {showLoginPrompt && (
+                    <motion.div
+                        className="fixed bottom-28 right-8 bg-white rounded-lg shadow-xl p-4 z-50 border-2 border-party-red-500"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                    >
+                        <div className="flex items-center gap-2">
+                            <Lock className="text-party-red-600" size={20} />
+                            <p className="text-sm font-medium text-gray-900">
+                                Vui lòng đăng nhập để sử dụng trợ lý AI
+                            </p>
+                        </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
 
@@ -145,7 +176,21 @@ const FloatingChatBot: React.FC = () => {
                         {/* Messages Area */}
                         {!isMinimized && (
                             <>
-                                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                                <div 
+                                    className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 relative"
+                                    style={userProfile?.customBackground ? {
+                                        backgroundImage: `url(${userProfile.customBackground})`,
+                                        backgroundSize: 'cover',
+                                        backgroundPosition: 'center',
+                                        backgroundAttachment: 'fixed'
+                                    } : undefined}
+                                >
+                                    {/* Overlay để text dễ đọc hơn khi có background */}
+                                    {userProfile?.customBackground && (
+                                        <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]" />
+                                    )}
+                                    
+                                    <div className="relative z-10 space-y-4">
                                     {messages.map((message, index) => (
                                         <motion.div
                                             key={message.id}
@@ -210,6 +255,7 @@ const FloatingChatBot: React.FC = () => {
                                     )}
 
                                     <div ref={messagesEndRef} />
+                                    </div>
                                 </div>
 
                                 {/* Input Area */}
