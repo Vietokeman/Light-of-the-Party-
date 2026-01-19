@@ -141,6 +141,7 @@ const HangmanPage: React.FC = () => {
       if (gameStatus !== 'playing') return;
       
       const key = e.key.toUpperCase();
+      // Chỉ chấp nhận chữ cái A-Z, không chấp nhận số
       if (/^[A-Z]$/.test(key)) {
         handleGuess(key);
       }
@@ -158,7 +159,7 @@ const HangmanPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-party-red-50 via-party-gold-50 to-white p-4 overflow-auto">
       <div className="max-w-4xl mx-auto py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 mt-4">
           <button
             onClick={() => navigate('/')}
             className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow hover:shadow-lg text-party-red-600 hover:text-party-red-700 font-medium transition-all hover:scale-105"

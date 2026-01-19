@@ -290,14 +290,16 @@ export const useAuth = () => {
 // Helper function to get user-friendly error messages
 function getAuthErrorMessage(errorCode: string): string {
   const errorMessages: Record<string, string> = {
-    'auth/user-not-found': 'Không tìm thấy tài khoản với email này',
-    'auth/wrong-password': 'Mật khẩu không chính xác',
-    'auth/email-already-in-use': 'Email này đã được sử dụng',
-    'auth/weak-password': 'Mật khẩu phải có ít nhất 6 ký tự',
-    'auth/invalid-email': 'Email không hợp lệ',
-    'auth/too-many-requests': 'Quá nhiều yêu cầu. Vui lòng thử lại sau',
+    'auth/user-not-found': 'Tài khoản không tồn tại. Vui lòng đăng ký.',
+    'auth/wrong-password': 'Mật khẩu không đúng. Vui lòng thử lại.',
+    'auth/invalid-credential': 'Tài khoản hoặc mật khẩu không đúng.',
+    'auth/email-already-in-use': 'Email đã được sử dụng. Vui lòng đăng nhập.',
+    'auth/weak-password': 'Mật khẩu quá yếu. Vui lòng dùng ít nhất 6 ký tự.',
+    'auth/invalid-email': 'Email không hợp lệ.',
+    'auth/too-many-requests': 'Quá nhiều lần thử. Vui lòng thử lại sau.',
     'auth/popup-closed-by-user': 'Cửa sổ đăng nhập đã bị đóng',
     'auth/network-request-failed': 'Lỗi kết nối mạng',
+    'auth/account-exists-with-different-credential': 'Email đã được sử dụng với phương thức khác.',
   };
 
   return errorMessages[errorCode] || 'Đã xảy ra lỗi. Vui lòng thử lại';

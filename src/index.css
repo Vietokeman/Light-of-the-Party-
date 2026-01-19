@@ -7,6 +7,18 @@
    Communist Red & Gold Color Palette
    =================================== */
 
+/* Fix font rendering for Vietnamese diacritics */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
+}
+
 @keyframes float {
   0%, 100% {
     transform: translateY(0px) rotateY(0deg) rotateZ(0deg);

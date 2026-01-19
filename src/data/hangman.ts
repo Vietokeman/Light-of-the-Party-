@@ -1,86 +1,136 @@
-// Hangman game word data
+// Hangman game word data based on Chapter 4 - Party and State
 export interface HangmanWord {
   word: string;
   hint: string;
   category: string;
 }
 
-// Sample words about Vietnamese Party History and Ho Chi Minh Ideology (in English)
+// Words based on Chapter 4: Party and State Building
 export const hangmanWords: HangmanWord[] = [
   {
-    word: 'INDEPENDENCE',
-    hint: 'Mục tiêu chiến đấu của cách mạng',
+    word: 'LANH DAO',
+    hint: 'Vai trò quan trọng nhất của Đảng',
+    category: 'Vai trò Đảng',
+  },
+  {
+    word: 'CAN KIEM LIEM CHINH',
+    hint: 'Bốn đức của đảng viên',
+    category: 'Đạo đức',
+  },
+  {
+    word: 'TAP TRUNG DAN CHU',
+    hint: 'Nguyên tắc cơ bản của Đảng',
+    category: 'Nguyên tắc',
+  },
+  {
+    word: 'TU PHE BINH',
+    hint: 'Luật phát triển của Đảng',
+    category: 'Nguyên tắc',
+  },
+  {
+    word: 'PHONG TRAO YEU NUOC',
+    hint: 'Yếu tố thứ ba dẫn đến thành lập Đảng',
     category: 'Lịch sử',
   },
   {
-    word: 'MARXISM LENINISM',
-    hint: 'Nền tảng tư tưởng của Đảng',
-    category: 'Lý luận',
+    word: 'DUONG KACH MENH',
+    hint: 'Tác phẩm của Bác về Đảng cách mạng',
+    category: 'Tác phẩm',
   },
   {
-    word: 'UNITY',
-    hint: 'Sức mạnh từ nhân dân',
-    category: 'Giá trị',
+    word: 'DI CHUC',
+    hint: 'Tâm huyết cuối cùng của Bác',
+    category: 'Tác phẩm',
   },
   {
-    word: 'VIET MINH',
-    hint: 'Mặt trận thành lập năm 1941',
+    word: 'CHI CONG VO TU',
+    hint: 'Phẩm chất của người cán bộ',
+    category: 'Đạo đức',
+  },
+  {
+    word: 'PHUC VU NHAN DAN',
+    hint: 'Mục đích hoạt động của Đảng',
+    category: 'Mục đích',
+  },
+  {
+    word: 'DAN CHU CONG HOA',
+    hint: 'Chế độ của Nhà nước Việt Nam',
+    category: 'Nhà nước',
+  },
+  {
+    word: 'TOAN THE NHAN DAN',
+    hint: 'Chủ thể quyền lực trong nước',
+    category: 'Nhà nước',
+  },
+  {
+    word: 'PHONG CHONG TIEU CUC',
+    hint: 'Công việc thường xuyên lâu dài',
+    category: 'Xây dựng Đảng',
+  },
+  {
+    word: 'THAM O LANG PHI',
+    hint: 'Bạn đồng minh của thực dân',
+    category: 'Tiêu cực',
+  },
+  {
+    word: 'QUYEN LAM CHU',
+    hint: 'Quyền cơ bản của nhân dân',
+    category: 'Dân chủ',
+  },
+  {
+    word: 'HIEN PHAP',
+    hint: 'Luật cơ bản của Nhà nước',
+    category: 'Pháp luật',
+  },
+  {
+    word: 'TONG TUYEN CU',
+    hint: 'Hình thức bầu cử đại biểu',
+    category: 'Dân chủ',
+  },
+  {
+    word: 'CHINH DON DANG',
+    hint: 'Việc cần làm sau thống nhất',
+    category: 'Xây dựng Đảng',
+  },
+  {
+    word: 'DOI NGU CAN BO',
+    hint: 'Cần xây dựng vững mạnh',
     category: 'Tổ chức',
   },
   {
-    word: 'DIEN BIEN PHU',
-    hint: 'Chiến thắng lừng lẫy năm 1954',
-    category: 'Lịch sử',
+    word: 'GIAI CAP CONG NHAN',
+    hint: 'Giai cấp lãnh đạo cách mạng',
+    category: 'Giai cấp',
   },
   {
-    word: 'HO CHI MINH',
-    hint: 'Người sáng lập Đảng Cộng sản Việt Nam',
-    category: 'Nhân vật',
+    word: 'TRUNG THANH VOI DANG',
+    hint: 'Phẩm chất đầu tiên của cán bộ',
+    category: 'Đạo đức',
   },
   {
-    word: 'AUGUST REVOLUTION',
-    hint: 'Sự kiện lịch sử năm 1945',
-    category: 'Lịch sử',
+    word: 'LUAT PHAP NGHIEM MINH',
+    hint: 'Công cụ chống tiêu cực',
+    category: 'Pháp luật',
   },
   {
-    word: 'PEOPLE',
-    hint: 'Nguồn gốc sức mạnh của Đảng',
-    category: 'Giá trị',
+    word: 'DANG LA DAO DUC',
+    hint: 'Quan điểm của Bác năm mươi chín sáu mươi',
+    category: 'Đạo đức',
   },
   {
-    word: 'PARTY CONGRESS',
-    hint: 'Sự kiện quan trọng nhất của Đảng',
-    category: 'Tổ chức',
+    word: 'DANG LA VAN MINH',
+    hint: 'Đảng tiêu biểu cho lương tâm dân tộc',
+    category: 'Văn minh',
   },
   {
-    word: 'COMRADE',
-    hint: 'Cách gọi giữa các đảng viên',
-    category: 'Văn hóa',
+    word: 'KY LUAT TU GIAC',
+    hint: 'Sức mạnh vô địch của Đảng',
+    category: 'Kỷ luật',
   },
   {
-    word: 'COMMUNISM',
-    hint: 'Chế độ xã hội cao nhất',
-    category: 'Lý luận',
-  },
-  {
-    word: 'LIBERATION',
-    hint: 'Mục tiêu giải phóng dân tộc',
-    category: 'Lịch sử',
-  },
-  {
-    word: 'REUNIFICATION',
-    hint: 'Mục tiêu đạt được năm 1975',
-    category: 'Lịch sử',
-  },
-  {
-    word: 'PRESIDENT HO CHI MINH',
-    hint: 'Vị lãnh tụ vĩ đại của dân tộc',
-    category: 'Nhân vật',
-  },
-  {
-    word: 'REFORM',
-    hint: 'Chủ trương đổi mới từ năm 1986',
-    category: 'Chính sách',
+    word: 'NHAN DAN LAO DONG',
+    hint: 'Lực lượng to lớn vô cùng vô tận',
+    category: 'Nhân dân',
   },
 ];
 
@@ -89,7 +139,13 @@ export const getRandomWord = (): HangmanWord => {
   return hangmanWords[Math.floor(Math.random() * hangmanWords.length)];
 };
 
-// Simple normalization for English
+// Normalization for Vietnamese with diacritics
 export const normalizeVietnamese = (str: string): string => {
-  return str.toUpperCase().trim();
+  return str
+    .toUpperCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/Đ/g, 'D')
+    .replace(/đ/g, 'D')
+    .trim();
 };
