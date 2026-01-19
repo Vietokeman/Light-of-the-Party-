@@ -33,6 +33,13 @@ const HangmanPage: React.FC = () => {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
 
+  // Auto-save score when game finishes
+  useEffect(() => {
+    if (gameStatus === 'finished' && !scoreSaved) {
+      handleSaveScore();
+    }
+  }, [gameStatus, scoreSaved]);
+
   // Initialize first word
   useEffect(() => {
     getNewWord();
@@ -82,9 +89,6 @@ const HangmanPage: React.FC = () => {
         if (currentQuestion >= TOTAL_QUESTIONS) {
           setLastQuestionStatus('lost');
           setGameStatus('finished');
-          setTimeout(() => {
-            handleSaveScore();
-          }, 100);
         }
 
         setShowResult(true);
@@ -108,10 +112,6 @@ const HangmanPage: React.FC = () => {
         if (currentQuestion >= TOTAL_QUESTIONS) {
           setLastQuestionStatus('won');
           setGameStatus('finished');
-          // Save score after state updates
-          setTimeout(() => {
-            handleSaveScore();
-          }, 100);
         }
 
         setShowResult(true);
