@@ -363,7 +363,7 @@ const HangmanPage: React.FC = () => {
             <Trophy className="w-20 h-20 mx-auto mb-4 text-party-gold-500" />
             <h2 className="text-3xl font-bold mb-2">Hoàn thành!</h2>
             <div className="mb-6 space-y-2">
-              <p className="text-2xl">
+              <p className="text-2xl text-gray-800">
                 Điểm số: <span className="font-bold text-party-red-600">{score}</span>
               </p>
               <p className="text-gray-600">
