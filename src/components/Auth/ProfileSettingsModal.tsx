@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Image, Save, Loader, Check } from 'lucide-react';
+import { X, User, Image, Save, Loader, Check, Upload } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { UploadService } from '@/services/cloudinaryService';
 
 interface ProfileSettingsModalProps {
   isOpen: boolean;
@@ -15,8 +16,52 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isOpen, onC
   const [photoURL, setPhotoURL] = useState(userProfile?.photoURL || '');
   const [customBackground, setCustomBackground] = useState(userProfile?.customBackground || '');
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingBackground, setUploadingBackground] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const backgroundInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (file: File, type: 'avatar' | 'background') => {
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      setError('Kích thước file không được vượt quá 5MB');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setError('Vui lòng chọn file ảnh');
+      return;
+    }
+
+    try {
+      if (type === 'avatar') {
+        setUploadingAvatar(true);
+      } else {
+        setUploadingBackground(true);
+      }
+
+      setError(null);
+      const url = await UploadService(file);
+
+      if (url) {
+        if (type === 'avatar') {
+          setPhotoURL(url);
+        } else {
+          setCustomBackground(url);
+        }
+      } else {
+        setError('Upload thất bại. Vui lòng thử lại.');
+      }
+    } catch (err) {
+      setError('Có lỗi xảy ra khi upload ảnh');
+    } finally {
+      setUploadingAvatar(false);
+      setUploadingBackground(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,60 +170,136 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isOpen, onC
                 {/* Avatar URL */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    URL Ảnh đại diện
+                    Ảnh đại diện
                   </label>
-                  <div className="relative">
-                    <Image className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+
+                  {/* Preview */}
+                  {photoURL && (
+                    <div className="mb-2 flex justify-center">
+                      <img
+                        src={photoURL}
+                        alt="Avatar preview"
+                        className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/96';
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    {/* File upload button */}
+                    <button
+                      type="button"
+                      onClick={() => avatarInputRef.current?.click()}
+                      disabled={uploadingAvatar}
+                      className="w-full py-2 px-4 bg-gradient-to-r from-party-red-600 to-party-gold-500 text-white font-medium rounded-lg hover:shadow-md transition disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {uploadingAvatar ? (
+                        <>
+                          <Loader size={18} className="animate-spin" />
+                          Đang upload...
+                        </>
+                      ) : (
+                        <>
+                          <Upload size={18} />
+                          Upload ảnh đại diện
+                        </>
+                      )}
+                    </button>
                     <input
-                      type="url"
-                      value={photoURL}
-                      onChange={(e) => setPhotoURL(e.target.value)}
-                      placeholder="https://example.com/avatar.jpg"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-party-red-500 focus:border-transparent text-gray-900"
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileUpload(file, 'avatar');
+                      }}
+                      className="hidden"
                     />
+
+                    {/* URL input */}
+                    <div className="relative">
+                      <Image className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                      <input
+                        type="url"
+                        value={photoURL}
+                        onChange={(e) => setPhotoURL(e.target.value)}
+                        placeholder="hoặc dán URL ảnh"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-party-red-500 focus:border-transparent text-gray-900 text-sm"
+                      />
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Dán URL hình ảnh từ internet
-                  </p>
                 </div>
 
                 {/* Chat Background URL */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    URL Hình nền chat
+                    Hình nền chat
                   </label>
-                  <div className="relative">
-                    <Image className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                    <input
-                      type="url"
-                      value={customBackground}
-                      onChange={(e) => setCustomBackground(e.target.value)}
-                      placeholder="https://example.com/background.jpg"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-party-red-500 focus:border-transparent text-gray-900"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Hình nền sẽ hiển thị trong khung chat
-                  </p>
-                </div>
 
-                {/* Preview */}
-                {customBackground && (
-                  <div className="rounded-lg overflow-hidden h-24 relative">
-                    <img
-                      src={customBackground}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
+                  {/* Preview */}
+                  {customBackground && (
+                    <div className="mb-2 rounded-lg overflow-hidden h-32 relative">
+                      <img
+                        src={customBackground}
+                        alt="Background preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                      <span className="absolute bottom-2 left-2 text-white text-xs font-medium">
+                        Xem trước hình nền
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    {/* File upload button */}
+                    <button
+                      type="button"
+                      onClick={() => backgroundInputRef.current?.click()}
+                      disabled={uploadingBackground}
+                      className="w-full py-2 px-4 bg-gradient-to-r from-party-red-600 to-party-gold-500 text-white font-medium rounded-lg hover:shadow-md transition disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {uploadingBackground ? (
+                        <>
+                          <Loader size={18} className="animate-spin" />
+                          Đang upload...
+                        </>
+                      ) : (
+                        <>
+                          <Upload size={18} />
+                          Upload hình nền
+                        </>
+                      )}
+                    </button>
+                    <input
+                      ref={backgroundInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileUpload(file, 'background');
                       }}
+                      className="hidden"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-                    <span className="absolute bottom-2 left-2 text-white text-xs">
-                      Xem trước hình nền
-                    </span>
+
+                    {/* URL input */}
+                    <div className="relative">
+                      <Image className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                      <input
+                        type="url"
+                        value={customBackground}
+                        onChange={(e) => setCustomBackground(e.target.value)}
+                        placeholder="hoặc dán URL ảnh"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-party-red-500 focus:border-transparent text-gray-900 text-sm"
+                      />
+                    </div>
                   </div>
-                )}
+                </div>
 
                 {/* Error message */}
                 {error && (
