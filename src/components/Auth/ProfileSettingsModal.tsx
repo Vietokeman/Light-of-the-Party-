@@ -10,7 +10,7 @@ interface ProfileSettingsModalProps {
 
 const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isOpen, onClose }) => {
   const { userProfile, updateUserProfile } = useAuth();
-  
+
   const [displayName, setDisplayName] = useState(userProfile?.displayName || '');
   const [photoURL, setPhotoURL] = useState(userProfile?.photoURL || '');
   const [customBackground, setCustomBackground] = useState(userProfile?.customBackground || '');
@@ -25,11 +25,29 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isOpen, onC
     setSuccess(false);
 
     try {
-      await updateUserProfile({
-        displayName: displayName.trim() || undefined,
-        photoURL: photoURL.trim() || undefined,
-        customBackground: customBackground.trim() || undefined,
-      });
+      // Only include fields that have values
+      const updates: any = {};
+
+      if (displayName.trim()) {
+        updates.displayName = displayName.trim();
+      }
+
+      if (photoURL.trim()) {
+        updates.photoURL = photoURL.trim();
+      }
+
+      if (customBackground.trim()) {
+        updates.customBackground = customBackground.trim();
+      }
+
+      // Only update if there are changes
+      if (Object.keys(updates).length === 0) {
+        setError('Vui lòng nhập ít nhất một thông tin để cập nhật');
+        setIsLoading(false);
+        return;
+      }
+
+      await updateUserProfile(updates);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
@@ -68,7 +86,7 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isOpen, onC
                 >
                   <X size={20} />
                 </button>
-                
+
                 <div className="flex items-center gap-4">
                   {/* Avatar preview */}
                   <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
@@ -147,9 +165,9 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isOpen, onC
                 {/* Preview */}
                 {customBackground && (
                   <div className="rounded-lg overflow-hidden h-24 relative">
-                    <img 
-                      src={customBackground} 
-                      alt="Preview" 
+                    <img
+                      src={customBackground}
+                      alt="Preview"
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
