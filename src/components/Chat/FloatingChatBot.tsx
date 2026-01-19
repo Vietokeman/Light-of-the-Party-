@@ -138,11 +138,12 @@ const FloatingChatBot: React.FC = () => {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        className="fixed bottom-8 right-8 w-96 h-[600px] rounded-2xl shadow-2xl overflow-hidden bg-white z-50 flex flex-col"
+                        className="fixed bottom-8 right-8 w-96 max-h-[calc(100vh-4rem)] rounded-2xl shadow-2xl overflow-hidden bg-white z-50 flex flex-col"
                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ type: 'spring', damping: 20 }}
+                        style={{ height: isMinimized ? 'auto' : '600px', maxHeight: 'calc(100vh - 4rem)' }}
                     >
                         {/* Header */}
                         <div className="bg-gradient-to-r from-red-600 to-yellow-500 text-white p-4 flex items-center justify-between">
@@ -177,7 +178,7 @@ const FloatingChatBot: React.FC = () => {
                         {/* Messages Area */}
                         {!isMinimized && (
                             <>
-                                <div 
+                                <div
                                     className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 relative"
                                     style={userProfile?.customBackground ? {
                                         backgroundImage: `url(${userProfile.customBackground})`,
@@ -190,72 +191,72 @@ const FloatingChatBot: React.FC = () => {
                                     {userProfile?.customBackground && (
                                         <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]" />
                                     )}
-                                    
+
                                     <div className="relative z-10 space-y-4">
-                                    {messages.map((message, index) => (
-                                        <motion.div
-                                            key={message.id}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: index * 0.05 }}
-                                            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                                        >
-                                            <div
-                                                className={`max-w-xs px-4 py-3 rounded-lg user-select-text select-text ${message.role === 'user'
-                                                    ? 'bg-red-500 text-white rounded-br-none'
-                                                    : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
-                                                    }`}
+                                        {messages.map((message, index) => (
+                                            <motion.div
+                                                key={message.id}
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: index * 0.05 }}
+                                                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                                             >
-                                                <p className="text-sm whitespace-pre-wrap break-words">
-                                                    {message.content.split('\n').map((line, i) => (
-                                                        <React.Fragment key={i}>
-                                                            {line.includes('**') ? (
-                                                                <>
-                                                                    {line.split(/(\*\*.*?\*\*)/).map((part, j) => (
-                                                                        part.startsWith('**') ? (
-                                                                            <strong key={j}>{part.slice(2, -2)}</strong>
-                                                                        ) : (
-                                                                            <span key={j}>{part}</span>
-                                                                        )
-                                                                    ))}
-                                                                </>
-                                                            ) : (
-                                                                line
-                                                            )}
-                                                            {i < message.content.split('\n').length - 1 && <br />}
-                                                        </React.Fragment>
-                                                    ))}
-                                                </p>
-                                            </div>
-                                        </motion.div>
-                                    ))}
+                                                <div
+                                                    className={`max-w-xs px-4 py-3 rounded-lg user-select-text select-text ${message.role === 'user'
+                                                        ? 'bg-red-500 text-white rounded-br-none'
+                                                        : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
+                                                        }`}
+                                                >
+                                                    <p className="text-sm whitespace-pre-wrap break-words">
+                                                        {message.content.split('\n').map((line, i) => (
+                                                            <React.Fragment key={i}>
+                                                                {line.includes('**') ? (
+                                                                    <>
+                                                                        {line.split(/(\*\*.*?\*\*)/).map((part, j) => (
+                                                                            part.startsWith('**') ? (
+                                                                                <strong key={j}>{part.slice(2, -2)}</strong>
+                                                                            ) : (
+                                                                                <span key={j}>{part}</span>
+                                                                            )
+                                                                        ))}
+                                                                    </>
+                                                                ) : (
+                                                                    line
+                                                                )}
+                                                                {i < message.content.split('\n').length - 1 && <br />}
+                                                            </React.Fragment>
+                                                        ))}
+                                                    </p>
+                                                </div>
+                                            </motion.div>
+                                        ))}
 
-                                    {isLoading && (
-                                        <motion.div
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            className="flex justify-start"
-                                        >
-                                            <div className="bg-white text-gray-800 px-4 py-3 rounded-lg border border-gray-200 rounded-bl-none flex items-center gap-2">
-                                                <Loader size={16} className="animate-spin" />
-                                                <span className="text-sm">Đang xử lý...</span>
-                                            </div>
-                                        </motion.div>
-                                    )}
+                                        {isLoading && (
+                                            <motion.div
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                className="flex justify-start"
+                                            >
+                                                <div className="bg-white text-gray-800 px-4 py-3 rounded-lg border border-gray-200 rounded-bl-none flex items-center gap-2">
+                                                    <Loader size={16} className="animate-spin" />
+                                                    <span className="text-sm">Đang xử lý...</span>
+                                                </div>
+                                            </motion.div>
+                                        )}
 
-                                    {error && (
-                                        <motion.div
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            className="flex justify-center"
-                                        >
-                                            <div className="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm border border-red-200">
-                                                ⚠️ {error}
-                                            </div>
-                                        </motion.div>
-                                    )}
+                                        {error && (
+                                            <motion.div
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                className="flex justify-center"
+                                            >
+                                                <div className="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm border border-red-200">
+                                                    ⚠️ {error}
+                                                </div>
+                                            </motion.div>
+                                        )}
 
-                                    <div ref={messagesEndRef} />
+                                        <div ref={messagesEndRef} />
                                     </div>
                                 </div>
 
@@ -289,9 +290,9 @@ const FloatingChatBot: React.FC = () => {
             </AnimatePresence>
 
             {/* Login Modal */}
-            <LoginModal 
-                isOpen={showLoginModal} 
-                onClose={() => setShowLoginModal(false)} 
+            <LoginModal
+                isOpen={showLoginModal}
+                onClose={() => setShowLoginModal(false)}
             />
         </>
     );
