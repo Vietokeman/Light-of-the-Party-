@@ -114,7 +114,7 @@ const HangmanPage: React.FC = () => {
         TOTAL_QUESTIONS,
         correctAnswers,
         maxStreak,
-        userProfile.photoURL
+        userProfile.photoURL || undefined
       );
       setScoreSaved(true);
     } catch (error) {

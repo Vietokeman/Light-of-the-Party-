@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { MessageCircle, BookOpen, Cpu, Users, ArrowRight, Sparkles } from 'lucide-react';
 import { Button, Card, Badge, StarIcon } from '@/components/common';
+import { LoginModal } from '@/components/Auth';
 
 const HomePage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  useEffect(() => {
+    // Check if we should open login modal
+    if (searchParams.get('login') === 'true') {
+      setShowLoginModal(true);
+      // Remove the query parameter
+      searchParams.delete('login');
+      setSearchParams(searchParams);
+    }
+  }, [searchParams, setSearchParams]);
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -88,10 +102,12 @@ const HomePage: React.FC = () => {
               transition={{ delay: 0.5 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <Button variant="gold" size="lg">
-                <MessageCircle className="mr-2" size={20} />
-                Bắt đầu trò chuyện
-              </Button>
+              <Link to="/chat">
+                <Button variant="gold" size="lg">
+                  <MessageCircle className="mr-2" size={20} />
+                  Bắt đầu trò chuyện
+                </Button>
+              </Link>
               <Link to="/ai-usage">
                 <Button variant="outline" size="lg">
                   <BookOpen className="mr-2" size={20} />
@@ -206,6 +222,12 @@ const HomePage: React.FC = () => {
           </Link>
         </div>
       </section>
+
+      {/* Login Modal */}
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)}
+      />
     </div>
   );
 };

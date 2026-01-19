@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Loader, MessageCircle, X, Minimize2, Maximize2, Lock } from 'lucide-react';
 import { sendMessageToGemini } from '../../services/geminiService';
 import { useAuth } from '@/context/AuthContext';
+import { LoginModal } from '@/components/Auth';
 
 interface Message {
     id: string;
@@ -16,6 +17,7 @@ const FloatingChatBot: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '0',
@@ -39,8 +41,7 @@ const FloatingChatBot: React.FC = () => {
 
     const handleOpenChat = () => {
         if (!user) {
-            setShowLoginPrompt(true);
-            setTimeout(() => setShowLoginPrompt(false), 3000);
+            setShowLoginModal(true);
             return;
         }
         setIsOpen(true);
@@ -182,7 +183,7 @@ const FloatingChatBot: React.FC = () => {
                                         backgroundImage: `url(${userProfile.customBackground})`,
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
-                                        backgroundAttachment: 'fixed'
+                                        backgroundRepeat: 'no-repeat'
                                     } : undefined}
                                 >
                                     {/* Overlay để text dễ đọc hơn khi có background */}
@@ -286,6 +287,12 @@ const FloatingChatBot: React.FC = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Login Modal */}
+            <LoginModal 
+                isOpen={showLoginModal} 
+                onClose={() => setShowLoginModal(false)} 
+            />
         </>
     );
 };

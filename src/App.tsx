@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { Header, Footer, ScrollToTop } from '@/components/layout';
-import { FloatingChatBot } from '@/components/Chat';
 import { IntroLoader, IntroSection } from '@/components/Intro';
-import { HomePage, AIUsagePage, AboutPage, HangmanPage } from '@/pages';
+import { HomePage, AIUsagePage, AboutPage, HangmanPage, ChatPage } from '@/pages';
 
 const App: React.FC = () => {
   const [showIntroLoader, setShowIntroLoader] = useState(true);
@@ -49,15 +48,13 @@ const App: React.FC = () => {
         style={{ visibility: showContent ? 'visible' : 'hidden' }}
       >
         <Router>
-          {/* Global Floating ChatBot - Available on all routes */}
-          <FloatingChatBot />
-
           <div className="min-h-screen bg-gradient-to-br from-red-50 via-yellow-50 to-white">
             <Header />
             
             <main>
               <Routes>
                 <Route path="/" element={<HomePage />} />
+                <Route path="/chat" element={<ChatPage />} />
                 <Route path="/ai-usage" element={<AIUsagePage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/hangman" element={<HangmanPage />} />

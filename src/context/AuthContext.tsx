@@ -14,6 +14,7 @@ import { doc, setDoc, getDoc, serverTimestamp, increment } from 'firebase/firest
 import { auth, db } from '@/config/firebase';
 import { UserProfile, ProfileUpdatePayload, WallpaperConfig } from '@/types';
 import { setUserOnline, setUserOffline } from '@/services/visitorService';
+import { setupPresenceListener, updateUserPresence } from '@/services/userStatsService';
 
 interface AuthContextType {
   user: User | null;
@@ -118,6 +119,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await syncUserProfile(firebaseUser);
         // Mark user as online
         await setUserOnline(firebaseUser.uid, firebaseUser.displayName || undefined);
+        // Setup presence tracking
+        const cleanupPresence = setupPresenceListener(firebaseUser.uid);
+        
+        // Cleanup presence on unmount
+        return () => {
+          cleanupPresence();
+        };
       } else {
         setUserProfile(null);
         setWallpaperConfig({ type: 'default' });
@@ -205,6 +213,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Mark user as offline before signing out
       if (user) {
         await setUserOffline(user.uid);
+        await updateUserPresence(user.uid, false);
       }
       await firebaseSignOut(auth);
       setUser(null);

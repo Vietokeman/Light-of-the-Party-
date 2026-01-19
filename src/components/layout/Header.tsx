@@ -5,9 +5,11 @@ import { Menu, X, User, LogOut, Settings, Users, ImageIcon } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext';
 import { LoginModal, ProfileSettingsModal } from '@/components/Auth';
 import VisitorCounter from './VisitorCounter';
+import { UserStats } from '@/components/Stats';
 
 const navItems = [
   { label: 'Trang chủ', href: '/' },
+  { label: 'Trò chuyện AI', href: '/chat' },
   { label: 'Trò chơi Hangman', href: '/hangman' },
   { label: 'Báo cáo AI', href: '/ai-usage' },
   { label: 'Giới thiệu', href: '/about' },
@@ -76,8 +78,13 @@ const Header: React.FC = () => {
               ))}
             </nav>
 
-            {/* Right side: Visitor Counter + Auth */}
+            {/* Right side: User Stats + Visitor Counter + Auth */}
             <div className="flex items-center gap-4">
+              {/* User Stats */}
+              <div className="hidden lg:block">
+                <UserStats />
+              </div>
+              
               {/* Visitor Counter */}
               <VisitorCounter />
 
