@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Cpu, 
@@ -15,6 +15,11 @@ import {
 import { Card, Badge } from '@/components/common';
 
 const AIUsagePage: React.FC = () => {
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen pt-20">
       {/* Hero */}

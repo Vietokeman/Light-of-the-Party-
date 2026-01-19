@@ -13,6 +13,11 @@ const TOTAL_QUESTIONS = 10;
 const HangmanPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, userProfile } = useAuth();
+
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
