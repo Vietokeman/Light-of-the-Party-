@@ -3,6 +3,7 @@ import { db } from '@/config/firebase';
 import { VisitorStats } from '@/types';
 
 const ONLINE_USERS_COLLECTION = 'onlineUsers';
+const USERS_COLLECTION = 'users';
 
 /**
  * Mark user as online when they log in
@@ -90,11 +91,44 @@ export function subscribeToVisitorStats(
   });
 }
 
+/**
+ * Get total registered users count
+ */
+export async function getTotalRegisteredUsers(): Promise<number> {
+  try {
+    const usersRef = collection(db, USERS_COLLECTION);
+    const snapshot = await getDocs(usersRef);
+    return snapshot.size;
+  } catch (error) {
+    console.error('Error getting total registered users:', error);
+    return 0;
+  }
+}
+
+/**
+ * Subscribe to real-time total registered users count
+ */
+export function subscribeToTotalRegisteredUsers(
+  callback: (count: number) => void
+): () => void {
+  const usersRef = collection(db, USERS_COLLECTION);
+  
+  const unsubscribe = onSnapshot(usersRef, (snapshot) => {
+    callback(snapshot.size);
+  }, (error) => {
+    console.error('Error subscribing to total registered users:', error);
+  });
+
+  return unsubscribe;
+}
+
 export default { 
   setUserOnline, 
   setUserOffline, 
   getOnlineUserCount, 
   subscribeToOnlineUsers,
+  getTotalRegisteredUsers,
+  subscribeToTotalRegisteredUsers,
   getVisitorStats, 
   subscribeToVisitorStats 
 };
