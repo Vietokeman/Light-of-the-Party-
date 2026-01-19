@@ -28,6 +28,7 @@ const HangmanPage: React.FC = () => {
   const [guessedLetters, setGuessedLetters] = useState<Set<string>>(new Set());
   const [wrongGuesses, setWrongGuesses] = useState(0);
   const [gameStatus, setGameStatus] = useState<'playing' | 'won' | 'lost' | 'finished'>('playing');
+  const [lastQuestionStatus, setLastQuestionStatus] = useState<'won' | 'lost' | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
@@ -79,6 +80,7 @@ const HangmanPage: React.FC = () => {
 
         // Auto-save score if this is the final question
         if (currentQuestion >= TOTAL_QUESTIONS) {
+          setLastQuestionStatus('lost');
           setGameStatus('finished');
           setTimeout(() => {
             handleSaveScore();
@@ -104,6 +106,7 @@ const HangmanPage: React.FC = () => {
 
         // Auto-save score if this is the final question
         if (currentQuestion >= TOTAL_QUESTIONS) {
+          setLastQuestionStatus('won');
           setGameStatus('finished');
           // Save score after state updates
           setTimeout(() => {
@@ -325,13 +328,18 @@ const HangmanPage: React.FC = () => {
                   </button>
                 )}
 
-                <div className={`w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center ${gameStatus === 'won' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                  }`}>
-                  {gameStatus === 'won' ? '✓' : '✗'}
+                <div className={`w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center ${(
+                  gameStatus === 'won' || (gameStatus === 'finished' && lastQuestionStatus === 'won')
+                ) ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                  {(
+                    gameStatus === 'won' || (gameStatus === 'finished' && lastQuestionStatus === 'won')
+                  ) ? '✓' : '✗'}
                 </div>
 
                 <h2 className="text-2xl font-bold mb-2">
-                  {gameStatus === 'won' ? 'Chính xác!' : 'Không chính xác!'}
+                  {(
+                    gameStatus === 'won' || (gameStatus === 'finished' && lastQuestionStatus === 'won')
+                  ) ? 'Chính xác!' : 'Không chính xác!'}
                 </h2>
 
                 <p className="text-gray-600 mb-4">

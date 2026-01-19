@@ -20,15 +20,20 @@ body {
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px) rotateY(0deg) rotateZ(0deg);
   }
+
   25% {
     transform: translateY(-12px) rotateY(8deg) rotateZ(3deg);
   }
+
   50% {
     transform: translateY(-5px) rotateY(0deg) rotateZ(0deg);
   }
+
   75% {
     transform: translateY(-12px) rotateY(-8deg) rotateZ(-3deg);
   }
@@ -43,7 +48,7 @@ body {
   --deep-red: #8b1a1a;
   --party-white: #ffffff;
   --off-white: #fafafa;
-  
+
   /* Historical Color Palette */
   --ancient-stone: #6b6560;
   --royal-burgundy: #8b1a1a;
@@ -55,16 +60,14 @@ body {
   --ink-black: #1a1a1a;
 
   /* Semantic colors */
-  --background: linear-gradient(
-    135deg,
-    var(--party-red) 0%,
-    #d32f2f 50%,
-    var(--vietnam-red) 100%
-  );
+  --background: linear-gradient(135deg,
+      var(--party-red) 0%,
+      #d32f2f 50%,
+      var(--vietnam-red) 100%);
   --foreground: var(--party-white);
   --card-background: var(--off-white);
   --card-border: var(--party-gold);
-  
+
   /* Glassmorphism */
   --glass-bg: rgba(255, 255, 255, 0.1);
   --glass-border: rgba(255, 255, 255, 0.2);
@@ -99,14 +102,27 @@ body {
   }
 
   /* Base Typography */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-weight: 700;
     line-height: 1.3;
   }
 
-  h1 { font-size: 2.5rem; }
-  h2 { font-size: 2rem; }
-  h3 { font-size: 1.5rem; }
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
 
   /* Links */
   a {
@@ -134,6 +150,7 @@ body {
 }
 
 @layer utilities {
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 10px;
@@ -188,18 +205,21 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 215, 0, 0.3),
-      transparent
-    );
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 215, 0, 0.3),
+        transparent);
     animation: shimmer 3s infinite;
   }
 
   @keyframes shimmer {
-    0% { left: -100%; }
-    100% { left: 100%; }
+    0% {
+      left: -100%;
+    }
+
+    100% {
+      left: 100%;
+    }
   }
 
   /* Vietnamese pattern overlay */
@@ -234,14 +254,17 @@ body {
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
   }
+
   .custom-scrollbar::-webkit-scrollbar-track {
     background: #fff5f5;
     border-radius: 3px;
   }
+
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: var(--party-red);
     border-radius: 3px;
   }
+
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: var(--deep-red);
   }
@@ -252,6 +275,7 @@ body {
       opacity: 0;
       transform: translateY(20px) scale(0.95);
     }
+
     to {
       opacity: 1;
       transform: translateY(0) scale(1);
@@ -263,6 +287,7 @@ body {
       opacity: 0;
       transform: translateY(10px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -279,19 +304,25 @@ body {
 
   /* Intro Loader Animations */
   @keyframes wave {
-    0%, 100% {
+
+    0%,
+    100% {
       transform: translateX(-5%);
     }
+
     50% {
       transform: translateX(5%);
     }
   }
 
   @keyframes starPulse {
-    0%, 100% {
+
+    0%,
+    100% {
       transform: scale(1);
       opacity: 1;
     }
+
     50% {
       transform: scale(1.05);
       opacity: 0.9;
@@ -304,8 +335,13 @@ body {
   }
 
   @keyframes heroZoom {
-    0% { transform: scale(1); }
-    100% { transform: scale(1.1); }
+    0% {
+      transform: scale(1);
+    }
+
+    100% {
+      transform: scale(1.1);
+    }
   }
 
   /* Party-themed button styles */
@@ -336,8 +372,15 @@ body {
   }
 
   @keyframes blink {
-    from, to { opacity: 1; }
-    50% { opacity: 0; }
+
+    from,
+    to {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0;
+    }
   }
 
   /* Streaming text animation */
@@ -346,8 +389,23 @@ body {
   }
 
   @keyframes fadeInText {
-    from { opacity: 0.5; }
-    to { opacity: 1; }
+    from {
+      opacity: 0.5;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Hide scrollbar utility */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
   }
 }
 
@@ -371,7 +429,7 @@ body {
 
 .wallpaper-stars {
   background-color: #0f0f1a;
-  background-image: 
+  background-image:
     radial-gradient(white 1px, transparent 1px),
     radial-gradient(white 1px, transparent 1px);
   background-size: 50px 50px, 30px 30px;

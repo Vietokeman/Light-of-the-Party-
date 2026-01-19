@@ -39,6 +39,20 @@ const FloatingChatBot: React.FC = () => {
         scrollToBottom();
     }, [messages]);
 
+    // DISABLED: Hide body scrollbar when chatbot is open (but allow scrolling)
+    useEffect(() => {
+        if (isOpen && !isMinimized) {
+            document.body.classList.add('scrollbar-hide');
+        } else {
+            document.body.classList.remove('scrollbar-hide');
+        }
+
+        // Cleanup on unmount
+        return () => {
+            document.body.classList.remove('scrollbar-hide');
+        };
+    }, [isOpen, isMinimized]);
+
     const handleOpenChat = () => {
         if (!user) {
             setShowLoginModal(true);
@@ -179,13 +193,17 @@ const FloatingChatBot: React.FC = () => {
                         {!isMinimized && (
                             <>
                                 <div
-                                    className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 relative"
-                                    style={userProfile?.customBackground ? {
-                                        backgroundImage: `url(${userProfile.customBackground})`,
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center',
-                                        backgroundRepeat: 'no-repeat'
-                                    } : undefined}
+                                    className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 relative scrollbar-hide"
+                                    style={{
+                                        ...(userProfile?.customBackground ? {
+                                            backgroundImage: `url(${userProfile.customBackground})`,
+                                            backgroundSize: 'cover',
+                                            backgroundPosition: 'center',
+                                            backgroundRepeat: 'no-repeat'
+                                        } : {}),
+                                        scrollbarWidth: 'none', // Firefox
+                                        msOverflowStyle: 'none', // IE/Edge
+                                    }}
                                 >
                                     {/* Overlay để text dễ đọc hơn khi có background */}
                                     {userProfile?.customBackground && (
