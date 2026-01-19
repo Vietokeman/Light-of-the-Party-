@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, User, LogOut, Settings, Users } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings, Users, ImageIcon } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { LoginModal, ProfileSettingsModal } from '@/components/Auth';
 import VisitorCounter from './VisitorCounter';
@@ -21,6 +21,7 @@ const Header: React.FC = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showAvatarPreview, setShowAvatarPreview] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -116,6 +117,19 @@ const Header: React.FC = () => {
                             {user?.email}
                           </p>
                         </div>
+                        {userProfile?.photoURL && (
+                          <button
+                            onClick={() => {
+                              setShowAvatarPreview(true);
+                              setShowUserMenu(false);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
+                          >
+                            <ImageIcon size={16} />
+                            Xem ảnh đại diện
+                          </button>
+                        )}
+                        
                         
                         <button
                           onClick={() => {
@@ -206,6 +220,46 @@ const Header: React.FC = () => {
       {/* Modals */}
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
       <ProfileSettingsModal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} />
+      
+      {/* Avatar Preview Modal */}
+      <AnimatePresence>
+        {showAvatarPreview && userProfile?.photoURL && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowAvatarPreview(false)}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="relative"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={() => setShowAvatarPreview(false)}
+                  className="absolute -top-10 right-0 text-white hover:text-gray-300 transition"
+                >
+                  <X size={32} />
+                </button>
+                <img
+                  src={userProfile.photoURL}
+                  alt={userProfile.displayName || 'Avatar'}
+                  className="max-w-full max-h-[80vh] rounded-lg shadow-2xl"
+                />
+                <div className="mt-4 text-center">
+                  <p className="text-white font-semibold text-lg">
+                    {userProfile.displayName || 'Ảnh đại diện'}
+                  </p>
+                </div>
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 };
